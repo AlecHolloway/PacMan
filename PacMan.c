@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-
+#include<SDL2.h/SDL.h>
 #define rows 10
 #define columns 10
 
