@@ -3,10 +3,12 @@
 #include<SDL2/SDL.h>
 #include<string.h>
 #include<stdbool.h>
+#include<ncurses.h>
 
 #define rows 10
 #define columns 10
 
+void movePacMan(int *pacman_ptr, int map[rows][columns], int direction);
 int main() {
     int wall = 0;
     int pellet = 1;
@@ -19,25 +21,36 @@ int main() {
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,3,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
     };
-    bool game = true; 
+    bool game = true;
+    initscr();
+    keypad(stdscr, TRUE); 
     while(game) {
         //get keyboard input
-        char input;
-        scanf("%c", &input);
-
-        if(game == false) {
+        int input;
+        int *pacman_ptr = &Map[4,5];
+	input = getch();
+        //printf("%d", input);
+        movePacMan(pacman_ptr, Map, input);
+	if(game == false) {
             return 1;
         }
 
     } 
 }
 
-int movePacMan(int map[rows][columns]) {
+void movePacMan(int *pacman_ptr,int map[rows][columns], int direction) {
+    switch(direction) {
+	case KEY_UP:
+	    printf("Hello World");
+    }
+}
+int checkNextMapValue(int map[rows][columns], int direction) {
+
 }
