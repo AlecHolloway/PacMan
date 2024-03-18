@@ -33,24 +33,26 @@ int main() {
     keypad(stdscr, TRUE); 
     while(game) {
         //get keyboard input
-        int input;
-        int *pacman_ptr = &Map[4,5];
-	input = getch();
-        //printf("%d", input);
+        int input = getch();
+        int *pacman_ptr = &Map[4][5];
         movePacMan(pacman_ptr, Map, input);
-	if(game == false) {
-            return 1;
+	    if(input == 'q') {
+            game = false;
         }
-
     } 
+    endwin();
+    return 0;
 }
 
 void movePacMan(int *pacman_ptr,int map[rows][columns], int direction) {
     switch(direction) {
-	case KEY_UP:
-	    printf("Hello World");
+        case KEY_UP:
+            printf("keyup\n");
+        case KEY_DOWN:
+            printf("keydown\n");
+        case KEY_LEFT:
+            printf("KEYleft\n");
+        case KEY_RIGHT:
+            printf("KEYRIGHT\n");    
     }
-}
-int checkNextMapValue(int map[rows][columns], int direction) {
-
 }
