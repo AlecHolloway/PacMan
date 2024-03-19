@@ -48,26 +48,44 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     int currentCol = (pacman_ptr - &Map[0][0]) % columns;
     
     switch(direction) {
+        //int KeyUpNextTile = checkKeyUpNextTile();
         case KEY_UP:
+          //if (KeyUpNextTile == 0) { printf("hitting wall"); }
             if (currentRow > 0 && Map[currentRow - 1][currentCol] == 0) {
                 printf("hitting wall\n");
             }
+            if (currentRow > 0 && Map[currentRow - 1][currentCol] == 4) {
+               printf("game over\n");
+            } 
             break;
         case KEY_DOWN:
             if (currentRow > 0 && Map[currentRow + 1][currentCol] == 0) {
                 printf("Hitting wall\n");
+            }
+            if (currentRow > 0 && Map[currentRow + 1][currentCol] == 4) {
+                printf("game over\n");
             }
             break;
         case KEY_LEFT:
             if (currentCol > 0 && Map[currentRow][currentCol - 1] == 0) {
                 printf("hitting wall\n");
             }
+            if (currentCol > 0 && Map[currentRow][currentCol - 1] == 4) {
+                printf("game over\n");
+            }
             break;
         case KEY_RIGHT:
             if (currentCol > 0 && Map[currentRow][currentCol + 1] == 0) {
                 printf("hitting wall\n");
             }
+            if (currentCol > 0 && Map[currentRow][currentCol + 1] == 4) {
+                printf("game over\n");
+            }
             break;
     }
 }
 
+int checkKeyUpNextTile();
+int checkKeyDownNextTile();
+int checkKeyLeftNextTile();
+int checkKeyRightNextTile();
