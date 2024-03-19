@@ -33,10 +33,9 @@ int main() {
     keypad(stdscr, TRUE);
     int *pacman_ptr = &Map[4][5];
     while(game) {
-        //get keyboard input
-        int input = getch();
-        movePacMan(pacman_ptr, Map, input);
-	    if(input == 'q') {
+        int keyboardInput = getch();
+        movePacMan(pacman_ptr, Map, keyboardInput);
+	    if(keyboardInput == 'q') {
             game = false;
         }
     } 
@@ -50,18 +49,25 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     
     switch(direction) {
         case KEY_UP:
-            if (currentRow > 0 && Map[currentRow - 1][currentCol] != 0) {
-                pacman_ptr -= columns; // Move up by adjusting pointer
+            if (currentRow > 0 && Map[currentRow - 1][currentCol] == 0) {
+                printf("hitting wall\n");
             }
             break;
         case KEY_DOWN:
-            printf("keydown\n");
+            if (currentRow > 0 && Map[currentRow + 1][currentCol] == 0) {
+                printf("Hitting wall\n");
+            }
             break;
         case KEY_LEFT:
-            printf("KEYleft\n");
+            if (currentCol > 0 && Map[currentRow][currentCol - 1] == 0) {
+                printf("hitting wall\n");
+            }
             break;
         case KEY_RIGHT:
-            printf("KEYRIGHT\n");    
+            if (currentCol > 0 && Map[currentRow][currentCol + 1] == 0) {
+                printf("hitting wall\n");
+            }
             break;
     }
 }
+
