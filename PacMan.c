@@ -8,7 +8,7 @@
 #define rows 10
 #define columns 10
 
-void movePacMan(int *pacman_ptr, int map[rows][columns], int direction);
+void movePacMan(int *pacman_ptr, int map[][columns], int direction);
 int main() {
     int wall = 0;
     int pellet = 1;
@@ -30,11 +30,11 @@ int main() {
     };
     bool game = true;
     initscr();
-    keypad(stdscr, TRUE); 
+    keypad(stdscr, TRUE);
+    int *pacman_ptr = &Map[4][5];
     while(game) {
         //get keyboard input
         int input = getch();
-        int *pacman_ptr = &Map[4][5];
         movePacMan(pacman_ptr, Map, input);
 	    if(input == 'q') {
             game = false;
@@ -44,15 +44,24 @@ int main() {
     return 0;
 }
 
-void movePacMan(int *pacman_ptr,int map[rows][columns], int direction) {
+void movePacMan(int *pacman_ptr, int Map[][columns], int direction) { 
+    int currentRow = (pacman_ptr - &Map[0][0]) / columns;
+    int currentCol = (pacman_ptr - &Map[0][0]) % columns;
+    
     switch(direction) {
         case KEY_UP:
-            printf("keyup\n");
+            if (currentRow > 0 && Map[currentRow - 1][currentCol] != 0) {
+                pacman_ptr -= columns; // Move up by adjusting pointer
+            }
+            break;
         case KEY_DOWN:
             printf("keydown\n");
+            break;
         case KEY_LEFT:
             printf("KEYleft\n");
+            break;
         case KEY_RIGHT:
             printf("KEYRIGHT\n");    
+            break;
     }
 }
