@@ -15,6 +15,12 @@
 #define Ghost 5
 void movePacMan(int *pacman_ptr, int map[][columns], int direction);
 int checkUpTile(int currentRow, int currentCol, int Map[][columns]);
+int checkDownTile(int currentRow, int currentCol, int Map[][columns]);
+int checkLeftTile(int currentRow, int currentCol, int Map[][columns]);
+int checkRightTile(int currentRow, int currentCol, int Map[][columns]);
+
+
+
 int main() {
     
     int Map[rows][columns] = {
@@ -51,34 +57,36 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     switch(direction) {
         case KEY_UP:
             if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 
+            else if (checkUpTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
+            else if (checkUpTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
+            else if (checkUpTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
+            else if (checkUpTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
             break;
         case KEY_DOWN:
-            if (currentRow > 0 && Map[currentRow + 1][currentCol] == Wall) {
-                printf("Hitting wall\n");
-            }
-            if (currentRow > 0 && Map[currentRow + 1][currentCol] == Ghost) {
-                printf("game over\n");
-            }
+            if (checkDownTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 
+            else if (checkDownTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
+            else if (checkDownTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
+            else if (checkDownTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
+            else if (checkDownTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
             break;
         case KEY_LEFT:
-            if (currentCol > 0 && Map[currentRow][currentCol - 1] == Wall) {
-                printf("hitting wall\n");
-            }
-            if (currentCol > 0 && Map[currentRow][currentCol - 1] == Ghost) {
-                printf("game over\n");
-            }
+            if (checkLeftTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 
+            else if (checkLeftTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
+            else if (checkLeftTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
+            else if (checkLeftTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
+            else if (checkLeftTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
             break;
         case KEY_RIGHT:
-            if (currentCol > 0 && Map[currentRow][currentCol + 1] == Wall) {
-                printf("hitting wall\n");
-            }
-            if (currentCol > 0 && Map[currentRow][currentCol + 1] == 4) {
-                printf("game over\n");
-            }
-            break;
+            if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 
+            else if (checkRightTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
+            else if (checkRightTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
+            else if (checkRightTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
+            else if (checkRightTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
+            break; 
     }
 }
 
+//move these to a sepearate .h file
 int checkUpTile(int currentRow, int currentCol, int Map[][columns]) {
     if (currentRow > 0 && Map[currentRow - 1][currentCol] == Wall) { return Wall; }
     else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Ghost) { return Ghost; }
@@ -86,6 +94,25 @@ int checkUpTile(int currentRow, int currentCol, int Map[][columns]) {
     else if (currentRow > 0 && Map[currentRow - 1][currentCol] == PowerPellet) { return PowerPellet; }
     else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Pellet) { return Pellet; }
 }
-int checkDownTile();
-int checkLeftTile();
-int checkTile();
+int checkDownTile(int currentRow, int currentCol, int Map[][columns]) {
+    if (currentRow > 0 && Map[currentRow + 1][currentCol] == Wall) { return Wall; }
+    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == Ghost) { return Ghost; }
+    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == Empty) { return Empty; }
+    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == PowerPellet) { return PowerPellet; }
+    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == Pellet) { return Pellet; }
+}
+int checkLeftTile(int currentRow, int currentCol, int Map[][columns]) {
+    if (currentRow > 0 && Map[currentRow ][currentCol - 1] == Wall) { return Wall; }
+    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == Ghost) { return Ghost; }
+    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == Empty) { return Empty; }
+    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == PowerPellet) { return PowerPellet; }
+    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == Pellet) { return Pellet; }
+}
+int checkRightTile(int currentRow, int currentCol, int Map[][columns]) {
+    if (currentRow > 0 && Map[currentRow][currentCol + 1] == Wall) { return Wall; }
+    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == Ghost) { return Ghost; }
+    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == Empty) { return Empty; }
+    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == PowerPellet) { return PowerPellet; }
+    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == Pellet) { return Pellet; }
+}
+;
