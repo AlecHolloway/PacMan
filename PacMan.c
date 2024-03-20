@@ -7,22 +7,23 @@
 
 #define rows 10
 #define columns 10
-
+#define Empty 0
+#define Wall 1
+#define PowerPellet 2
+#define Pellet 3
+#define PacMan 4
+#define Ghost 5
 void movePacMan(int *pacman_ptr, int map[][columns], int direction);
+int checkUpTile(int currentRow, int currentCol, int Map[][columns]);
 int main() {
-    int wall = 0;
-    int pellet = 1;
-    int powerPellet = 2;
-    int pacman = 3;
-    int ghost = 4;
-
+    
     int Map[rows][columns] = {
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,3,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,1,0,0,0,0},
+        {0,0,0,0,5,4,5,0,0,0},
+        {0,0,0,0,0,1,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
@@ -48,34 +49,27 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     int currentCol = (pacman_ptr - &Map[0][0]) % columns;
     
     switch(direction) {
-        //int KeyUpNextTile = checkKeyUpNextTile();
         case KEY_UP:
-          //if (KeyUpNextTile == 0) { printf("hitting wall"); }
-            if (currentRow > 0 && Map[currentRow - 1][currentCol] == 0) {
-                printf("hitting wall\n");
-            }
-            if (currentRow > 0 && Map[currentRow - 1][currentCol] == 4) {
-               printf("game over\n");
-            } 
+            if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 
             break;
         case KEY_DOWN:
-            if (currentRow > 0 && Map[currentRow + 1][currentCol] == 0) {
+            if (currentRow > 0 && Map[currentRow + 1][currentCol] == Wall) {
                 printf("Hitting wall\n");
             }
-            if (currentRow > 0 && Map[currentRow + 1][currentCol] == 4) {
+            if (currentRow > 0 && Map[currentRow + 1][currentCol] == Ghost) {
                 printf("game over\n");
             }
             break;
         case KEY_LEFT:
-            if (currentCol > 0 && Map[currentRow][currentCol - 1] == 0) {
+            if (currentCol > 0 && Map[currentRow][currentCol - 1] == Wall) {
                 printf("hitting wall\n");
             }
-            if (currentCol > 0 && Map[currentRow][currentCol - 1] == 4) {
+            if (currentCol > 0 && Map[currentRow][currentCol - 1] == Ghost) {
                 printf("game over\n");
             }
             break;
         case KEY_RIGHT:
-            if (currentCol > 0 && Map[currentRow][currentCol + 1] == 0) {
+            if (currentCol > 0 && Map[currentRow][currentCol + 1] == Wall) {
                 printf("hitting wall\n");
             }
             if (currentCol > 0 && Map[currentRow][currentCol + 1] == 4) {
@@ -85,7 +79,13 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     }
 }
 
-int checkKeyUpNextTile();
-int checkKeyDownNextTile();
-int checkKeyLeftNextTile();
-int checkKeyRightNextTile();
+int checkUpTile(int currentRow, int currentCol, int Map[][columns]) {
+    if (currentRow > 0 && Map[currentRow - 1][currentCol] == Wall) { return Wall; }
+    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Ghost) { return Ghost; }
+    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Empty) { return Empty; }
+    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == PowerPellet) { return PowerPellet; }
+    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Pellet) { return Pellet; }
+}
+int checkDownTile();
+int checkLeftTile();
+int checkTile();
