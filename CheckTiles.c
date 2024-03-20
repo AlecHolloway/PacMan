@@ -1,3 +1,5 @@
+#include "consts.h"
+
 int checkUpTile(int currentRow, int currentCol, int Map[][columns]) {
     if (currentRow > 0 && Map[currentRow - 1][currentCol] == Wall) { return Wall; }
     else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Ghost) { return Ghost; }

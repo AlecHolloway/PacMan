@@ -4,22 +4,13 @@
 #include<string.h>
 #include<stdbool.h>
 #include<ncurses.h>
+#include "consts.h"
 
-#define rows 10
-#define columns 10
-#define Empty 0
-#define Wall 1
-#define PowerPellet 2
-#define Pellet 3
-#define PacMan 4
-#define Ghost 5
 void movePacMan(int *pacman_ptr, int map[][columns], int direction);
 int checkUpTile(int currentRow, int currentCol, int Map[][columns]);
 int checkDownTile(int currentRow, int currentCol, int Map[][columns]);
 int checkLeftTile(int currentRow, int currentCol, int Map[][columns]);
 int checkRightTile(int currentRow, int currentCol, int Map[][columns]);
-
-
 
 int main() {
     
@@ -28,7 +19,7 @@ int main() {
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,1,0,0,0,0},
-        {0,0,0,0,5,4,5,0,0,0},
+        {0,0,0,0,1,4,1,0,0,0},
         {0,0,0,0,0,1,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
@@ -86,33 +77,6 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     }
 }
 
-//move these to a sepearate .h file
-int checkUpTile(int currentRow, int currentCol, int Map[][columns]) {
-    if (currentRow > 0 && Map[currentRow - 1][currentCol] == Wall) { return Wall; }
-    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Ghost) { return Ghost; }
-    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Empty) { return Empty; }
-    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == PowerPellet) { return PowerPellet; }
-    else if (currentRow > 0 && Map[currentRow - 1][currentCol] == Pellet) { return Pellet; }
-}
-int checkDownTile(int currentRow, int currentCol, int Map[][columns]) {
-    if (currentRow > 0 && Map[currentRow + 1][currentCol] == Wall) { return Wall; }
-    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == Ghost) { return Ghost; }
-    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == Empty) { return Empty; }
-    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == PowerPellet) { return PowerPellet; }
-    else if (currentRow > 0 && Map[currentRow + 1][currentCol] == Pellet) { return Pellet; }
-}
-int checkLeftTile(int currentRow, int currentCol, int Map[][columns]) {
-    if (currentRow > 0 && Map[currentRow ][currentCol - 1] == Wall) { return Wall; }
-    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == Ghost) { return Ghost; }
-    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == Empty) { return Empty; }
-    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == PowerPellet) { return PowerPellet; }
-    else if (currentRow > 0 && Map[currentRow][currentCol - 1] == Pellet) { return Pellet; }
-}
-int checkRightTile(int currentRow, int currentCol, int Map[][columns]) {
-    if (currentRow > 0 && Map[currentRow][currentCol + 1] == Wall) { return Wall; }
-    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == Ghost) { return Ghost; }
-    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == Empty) { return Empty; }
-    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == PowerPellet) { return PowerPellet; }
-    else if (currentRow > 0 && Map[currentRow][currentCol + 1] == Pellet) { return Pellet; }
-}
-;
+
+
+
