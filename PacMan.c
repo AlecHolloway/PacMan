@@ -13,23 +13,33 @@ int checkLeftTile(int currentRow, int currentCol, int Map[][columns]);
 int checkRightTile(int currentRow, int currentCol, int Map[][columns]);
 
 int main() {
-    
-    int Map[rows][columns] = {
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,1,0,0,0,0},
-        {0,0,0,0,1,4,1,0,0,0},
-        {0,0,0,0,0,1,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
+   //consider adding AI to create new maps
+   int Map[rows][columns] = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+        {1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 3, 1, 3, 3, 1, 3, 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 1},
+        {1, 3, 1, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 1, 1, 3, 1},
+        {1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 1},
+        {1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 3, 3, 3, 1, 1, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 3, 1, 1, 5, 1, 3, 1, 3, 3, 3, 3, 3, 3, 1},
+        {1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 3, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1},
+        {1, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 3, 1},
+        {1, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 1, 3, 1},
+        {1, 1, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 1, 1, 3, 1},
+        {1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1},
+        {1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
     bool game = true;
     initscr();
     keypad(stdscr, TRUE);
-    int *pacman_ptr = &Map[4][5];
+    int *pacman_ptr = &Map[10][10];
     while(game) {
         int keyboardInput = getch();
         movePacMan(pacman_ptr, Map, keyboardInput);
@@ -47,11 +57,25 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
     
     switch(direction) {
         case KEY_UP:
-            if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 
-            else if (checkUpTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
-            else if (checkUpTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
-            else if (checkUpTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
-            else if (checkUpTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
+            if (checkUpTile(currentRow, currentCol, Map) == Wall) { 
+                printf("hitting wall\n");
+            } 
+            else if (checkUpTile(currentRow, currentCol, Map) == Empty) { 
+                printf("Nothing\n"); 
+            }
+            else if (checkUpTile(currentRow, currentCol, Map) == PowerPellet) { 
+                printf("PowerUP\n"); 
+            }
+            else if (checkUpTile(currentRow, currentCol, Map) == Pellet) { 
+                printf("Add to Score\n"); 
+            }
+            else if (checkUpTile(currentRow, currentCol, Map) == Ghost) { 
+                if(PowerUp == false) {
+                    printf("Game Over\n"); 
+                }
+                else {
+                }
+            }
             break;
         case KEY_DOWN:
             if (checkDownTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); } 

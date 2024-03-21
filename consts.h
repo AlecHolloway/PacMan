@@ -2,8 +2,8 @@
 #define consts_H
 
 
-#define rows 10
-#define columns 10
+#define rows 20
+#define columns 20
 #define Empty 0
 #define Wall 1
 #define PowerPellet 2
