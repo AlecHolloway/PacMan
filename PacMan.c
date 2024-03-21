@@ -6,15 +6,19 @@
 #include<ncurses.h>
 #include "consts.h"
 
-void movePacMan(int *pacman_ptr, int map[][columns], int direction);
+void movePacMan(int *pacman_ptr, int map[][columns], int direction, struct Stats);
 int checkUpTile(int currentRow, int currentCol, int Map[][columns]);
 int checkDownTile(int currentRow, int currentCol, int Map[][columns]);
 int checkLeftTile(int currentRow, int currentCol, int Map[][columns]);
 int checkRightTile(int currentRow, int currentCol, int Map[][columns]);
 
+struct Stats {
+    int score;
+    bool powerUp;
+};
+
 int main() {
-   //consider adding AI to create new maps
-   int Map[rows][columns] = {
+    int Map[rows][columns] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         {1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
         {1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -37,12 +41,15 @@ int main() {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
     bool game = true;
+    struct Stats playerStats; 
     initscr();
     keypad(stdscr, TRUE);
     int *pacman_ptr = &Map[10][10];
+    playerStats.powerUp = false;
+    playerStats.score = 0;
     while(game) {
         int keyboardInput = getch();
-        movePacMan(pacman_ptr, Map, keyboardInput);
+        movePacMan(pacman_ptr, Map, keyboardInput, playerStats);
 	    if(keyboardInput == 'q') {
             game = false;
         }
@@ -51,10 +58,10 @@ int main() {
     return 0;
 }
 
-void movePacMan(int *pacman_ptr, int Map[][columns], int direction) { 
+void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats) { 
     int currentRow = (pacman_ptr - &Map[0][0]) / columns;
     int currentCol = (pacman_ptr - &Map[0][0]) % columns;
-    
+
     switch(direction) {
         case KEY_UP:
             if (checkUpTile(currentRow, currentCol, Map) == Wall) { 
@@ -64,13 +71,15 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction) {
                 printf("Nothing\n"); 
             }
             else if (checkUpTile(currentRow, currentCol, Map) == PowerPellet) { 
-                printf("PowerUP\n"); 
+                printf("PowerUP\n");
+               //create thread to run this with a timer to end.
+                
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Pellet) { 
                 printf("Add to Score\n"); 
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Ghost) { 
-                if(PowerUp == false) {
+                if(playerStats.powerUp == false) {
                     printf("Game Over\n"); 
                 }
                 else {
