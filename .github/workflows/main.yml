@@ -15,4 +15,4 @@ jobs:
       - name: Run unit tests
         run: |
           # Run cppcheck with options to check for camel case function names
-          cppcheck --enable=style --inconclusive --error-exitcode=1 --check-config --quiet .
+          cppcheck --enable=all --inconclusive --error-exitcode=1 --check-config --quiet .
