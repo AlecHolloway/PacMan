@@ -1,2 +1,4 @@
 sudo apt-get install libncurses5-dev
 sudo apt-get install libsd12-dev
+
+ gcc CheckTiles.c PacMan.c -o PacMan -iquote .
