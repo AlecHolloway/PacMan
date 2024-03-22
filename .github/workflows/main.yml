@@ -1,0 +1,18 @@
+name: C/C++ CI
+
+on: push
+
+jobs:
+  test_project:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install cppcheck
+        run: sudo apt-get install cppcheck
+      
+      - name: Run unit tests
+        run: |
+          # Run cppcheck with options to check for camel case function names
+          cppcheck --enable=style --inconclusive --error-exitcode=1 --check-config --quiet .
