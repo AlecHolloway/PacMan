@@ -10,5 +10,9 @@
 #define Pellet 3
 #define PacMan 4
 #define Ghost 5
+#define Inky 10
+#define Blinky 11
+#define Pinky 12
+#define Clyde 13
 
 #endif /* consts_H */

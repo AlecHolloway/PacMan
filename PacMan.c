@@ -13,6 +13,8 @@ struct Stats {
     bool powerUp;
 };
 
+//TODO:create a way for the ghost constants to be broken down to 4 individual ghosts
+
 void movePacMan(int *pacman_ptr, int map[][columns], int direction, struct Stats *);
 int checkUpTile(int currentRow, int currentCol, int Map[][columns]);
 int checkDownTile(int currentRow, int currentCol, int Map[][columns]);
@@ -31,9 +33,9 @@ int main() {
         {1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 1},
         {1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 3, 3, 3, 1, 2, 4, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 3, 1, 1, 5, 2, 3, 1, 3, 3, 3, 3, 3, 3, 1},
-        {1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 3, 3, 3, 1, 2, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 3, 1, 1, 4, 5, 3, 1, 3, 3, 3, 3, 3, 3, 1},
+        {1, 3, 3, 3, 3, 1, 3, 3, 3, 2, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 3, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1},
         {1, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 3, 1},
         {1, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 1, 3, 1},
@@ -73,7 +75,7 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats
                 printf("hitting wall\n");
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Empty) {
-                printf("Nothing\n");
+                printf("empty\n");
             }
             else if (checkUpTile(currentRow, currentCol, Map) == PowerPellet) {
                 if(playerStats->powerUp == true) {
@@ -81,7 +83,7 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats
                 }
                 else {
                     playerStats->powerUp = false;
-               //create thread to run this with a timer to end.
+               //TODO:create thread to run this with a timer to end.
                     pthread_t tid;
                     if(pthread_create(&tid, NULL, handlePowerUp, (void*)playerStats)) {
                         fprintf(stderr, "error creating thread\n");
@@ -89,32 +91,36 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats
                 }
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Pellet) {
-                printf("Add to Score\n");
+                playerStats->score += 10;
+                printf("changing to 0\n");
+                //Map[currentRow][currentCol] = 0; ///TODO: arrays cannot be changed after creation 
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Ghost) {
                 if(playerStats->powerUp == false) {
                     printf("Game Over\n");
                 }
                 else {
+                    //TODO:reset ghost by going to block that contains 6
+                    //or wait 5-10 seconds before ghost is back to normal
                 }
             }
             break;
         case KEY_DOWN:
-            if (checkDownTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
+                 if (checkDownTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
             else if (checkDownTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
             else if (checkDownTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
             else if (checkDownTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
             else if (checkDownTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
             break;
         case KEY_LEFT:
-            if (checkLeftTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
+                 if (checkLeftTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
             else if (checkLeftTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
             else if (checkLeftTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
             else if (checkLeftTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
             else if (checkLeftTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
             break;
         case KEY_RIGHT:
-            if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
+                 if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
             else if (checkRightTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
             else if (checkRightTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
             else if (checkRightTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
@@ -127,7 +133,6 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats
 
 void *handlePowerUp(void *playerStats) {
         struct Stats *pStats = (struct Stats *)playerStats;
-        int seconds = 10;
         printf("power up enabled\n");
         sleep(10);
         pStats->powerUp = false;
@@ -135,5 +140,8 @@ void *handlePowerUp(void *playerStats) {
         pthread_exit(NULL);
 }
 
-
-
+//TODO
+void moveInky();
+void movePinky();
+void moveBlinky();
+void moveClyde();
