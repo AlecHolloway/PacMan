@@ -11,15 +11,15 @@
 struct Stats {
     int score;
     bool powerUp;
+    int lifes;
 };
 
-//TODO:create a way for the ghost constants to be broken down to 4 individual ghosts
 
-void movePacMan(int *pacman_ptr, int map[][columns], int direction, struct Stats *);
-int checkUpTile(int currentRow, int currentCol, int Map[][columns]);
-int checkDownTile(int currentRow, int currentCol, int Map[][columns]);
-int checkLeftTile(int currentRow, int currentCol, int Map[][columns]);
-int checkRightTile(int currentRow, int currentCol, int Map[][columns]);
+void movePacMan(int *pacman_ptr, void *map, int direction, struct Stats *);
+int checkUpTile(int currentRow, int currentCol, void *map_ptr);
+int checkDownTile(int currentRow, int currentCol, void *map_ptr);
+int checkLeftTile(int currentRow, int currentCol, void *map_ptr);
+int checkRightTile(int currentRow, int currentCol, void *map_ptr);
 void *handlePowerUp(void *);
 
 int main() {
@@ -34,8 +34,8 @@ int main() {
         {1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 3, 3, 3, 1, 2, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 3, 1, 1, 4, 5, 3, 1, 3, 3, 3, 3, 3, 3, 1},
-        {1, 3, 3, 3, 3, 1, 3, 3, 3, 2, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 3, 1, 1, 4, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1},
+        {1, 3, 3, 3, 3, 1, 3, 3, 3, 1, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 3, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1},
         {1, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 3, 1},
         {1, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 1, 3, 1},
@@ -54,6 +54,8 @@ int main() {
     int *pacman_ptr = &Map[9][9];
     playerStats->powerUp = false;
     playerStats->score = 0;
+    playerStats->lifes = 3;
+
     while(game) {
         int keyboardInput = getch();
         movePacMan(pacman_ptr, Map, keyboardInput, playerStats);
@@ -65,9 +67,10 @@ int main() {
     return 0;
 }
 
-void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats *playerStats) {
-    int currentRow = (pacman_ptr - &Map[0][0]) / columns;
-    int currentCol = (pacman_ptr - &Map[0][0]) % columns;
+void movePacMan(int *pacman_ptr, void *Map, int direction, struct Stats *playerStats) {
+    int(*mapPtr)[columns] = Map;
+    int currentRow = (pacman_ptr - *mapPtr) / columns;
+    int currentCol = (pacman_ptr - *mapPtr) % columns;
 
     switch(direction) {
         case KEY_UP:
@@ -92,8 +95,8 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Pellet) {
                 playerStats->score += 10;
-                printf("changing to 0\n");
-                //Map[currentRow][currentCol] = 0; ///TODO: arrays cannot be changed after creation 
+                printf("slot is now empty\n");
+                mapPtr[currentRow - 1][currentCol] = 0; 
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Ghost) {
                 if(playerStats->powerUp == false) {
@@ -120,7 +123,7 @@ void movePacMan(int *pacman_ptr, int Map[][columns], int direction, struct Stats
             else if (checkLeftTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
             break;
         case KEY_RIGHT:
-                 if (checkUpTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
+                 if (checkRightTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
             else if (checkRightTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
             else if (checkRightTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
             else if (checkRightTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
@@ -135,6 +138,7 @@ void *handlePowerUp(void *playerStats) {
         struct Stats *pStats = (struct Stats *)playerStats;
         printf("power up enabled\n");
         sleep(10);
+        //TODO: lock powerup because it is inside a thread
         pStats->powerUp = false;
         printf("power up disabled\n");
         pthread_exit(NULL);
@@ -145,3 +149,4 @@ void moveInky();
 void movePinky();
 void moveBlinky();
 void moveClyde();
+int *handleMapChange(int reason, int *Map);
