@@ -14,14 +14,14 @@ struct Stats {
     int lifes;
 };
 
-
-void movePacMan(int *pacman_ptr, void *map, int direction, struct Stats *);
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int *movePacMan(int *pacman_ptr, void *map, int direction, struct Stats *);
 int checkUpTile(int currentRow, int currentCol, void *map_ptr);
 int checkDownTile(int currentRow, int currentCol, void *map_ptr);
 int checkLeftTile(int currentRow, int currentCol, void *map_ptr);
 int checkRightTile(int currentRow, int currentCol, void *map_ptr);
 void *handlePowerUp(void *);
-
+void printMap(void *map_ptr);
 int main() {
 
     int Map[rows][columns] = {
@@ -34,9 +34,9 @@ int main() {
         {1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 3, 3, 3, 1, 2, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 3, 1, 1, 4, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1},
-        {1, 3, 3, 3, 3, 1, 3, 3, 3, 1, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
-        {1, 3, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1},
+        {1, 1, 1, 1, 1, 1, 3, 10, 3, 4, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1},
+        {1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1},
+        {1, 3, 1, 1, 3, 1, 3, 1, 1, 3, 1, 1, 1, 3, 1, 3, 3, 3, 3, 1},
         {1, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 3, 1},
         {1, 3, 3, 3, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3, 1, 3, 3, 1, 3, 1},
         {1, 1, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 1, 1, 3, 1},
@@ -57,17 +57,19 @@ int main() {
     playerStats->lifes = 3;
 
     while(game) {
+        printMap(Map);
         int keyboardInput = getch();
-        movePacMan(pacman_ptr, Map, keyboardInput, playerStats);
-            if(keyboardInput == 'q') {
+        //movePacMan function should return new pacman pointer
+        pacman_ptr = movePacMan(pacman_ptr, Map, keyboardInput, playerStats);
+        if(keyboardInput == 'q') {
             game = false;
         }
     }
     endwin();
     return 0;
 }
-
-void movePacMan(int *pacman_ptr, void *Map, int direction, struct Stats *playerStats) {
+//return address of PacMan
+int *movePacMan(int *pacman_ptr, void *Map, int direction, struct Stats *playerStats) {
     int(*mapPtr)[columns] = Map;
     int currentRow = (pacman_ptr - *mapPtr) / columns;
     int currentCol = (pacman_ptr - *mapPtr) % columns;
@@ -75,32 +77,46 @@ void movePacMan(int *pacman_ptr, void *Map, int direction, struct Stats *playerS
     switch(direction) {
         case KEY_UP:
             if (checkUpTile(currentRow, currentCol, Map) == Wall) {
-                printf("hitting wall\n");
+                printw("hitting wall\n");
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Empty) {
-                printf("empty\n");
+                printw("empty\n");
+                mapPtr[currentRow - 1][currentCol] = 4;
+                pacman_ptr = &mapPtr[currentRow - 1][currentCol];
+                mapPtr[currentRow][currentCol] = 0;
+                return pacman_ptr;
             }
             else if (checkUpTile(currentRow, currentCol, Map) == PowerPellet) {
+                pthread_t tid;
+                //if thread is in execution stop execution and start a fresh one
+                //essentially setting the timer back to 10
+                //
+                //is there a tid value that indicates it is not executing
                 if(playerStats->powerUp == true) {
-
+                    //handlePowerUp();
+                    mapPtr[currentRow][currentCol] = Empty;
+                    pacman_ptr = &mapPtr[currentRow - 1][currentCol];
+                    return pacman_ptr; 
                 }
                 else {
                     playerStats->powerUp = false;
-               //TODO:create thread to run this with a timer to end.
-                    pthread_t tid;
                     if(pthread_create(&tid, NULL, handlePowerUp, (void*)playerStats)) {
                         fprintf(stderr, "error creating thread\n");
                     }
+                    return pacman_ptr;
                 }
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Pellet) {
+                mapPtr[currentRow][currentCol] = Empty;
                 playerStats->score += 10;
-                printf("slot is now empty\n");
-                mapPtr[currentRow - 1][currentCol] = 0; 
+                printw("slot is now empty\n");
+                mapPtr[currentRow - 1][currentCol] = 4;
+                pacman_ptr = &mapPtr[currentRow - 1][currentCol];
+                return pacman_ptr; 
             }
             else if (checkUpTile(currentRow, currentCol, Map) == Ghost) {
                 if(playerStats->powerUp == false) {
-                    printf("Game Over\n");
+                    printw("Game Over\n");
                 }
                 else {
                     //TODO:reset ghost by going to block that contains 6
@@ -109,25 +125,152 @@ void movePacMan(int *pacman_ptr, void *Map, int direction, struct Stats *playerS
             }
             break;
         case KEY_DOWN:
-                 if (checkDownTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
-            else if (checkDownTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
-            else if (checkDownTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
-            else if (checkDownTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
-            else if (checkDownTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
+            if (checkDownTile(currentRow, currentCol, Map) == Wall) {
+                printw("hitting wall\n");
+            }
+            else if (checkDownTile(currentRow, currentCol, Map) == Empty) {
+                printw("empty\n");
+                mapPtr[currentRow + 1][currentCol] = 4;
+                mapPtr[currentRow][currentCol] = 0;
+                pacman_ptr = &mapPtr[currentRow + 1][currentCol];
+                return pacman_ptr;
+            }
+            else if (checkDownTile(currentRow, currentCol, Map) == PowerPellet) {
+                pthread_t tid;
+                //if thread is in execution stop execution and start a fresh one
+                //essentially setting the timer back to 10
+                //
+                //is there a tid value that indicates it is not executing
+                if(playerStats->powerUp == true) {
+                    //handlePowerUp();
+                    mapPtr[currentRow][currentCol] = Empty;
+                    pacman_ptr = &mapPtr[currentRow + 1][currentCol];
+                    return pacman_ptr; 
+                }
+                else {
+                    playerStats->powerUp = false;
+                    if(pthread_create(&tid, NULL, handlePowerUp, (void*)playerStats)) {
+                        fprintf(stderr, "error creating thread\n");
+                    }
+                    return pacman_ptr;
+                }
+            }
+            else if (checkDownTile(currentRow, currentCol, Map) == Pellet) {
+                mapPtr[currentRow][currentCol] = Empty;
+                playerStats->score += 10;
+                printw("slot is now empty\n");
+                mapPtr[currentRow + 1][currentCol] = 4;
+                pacman_ptr = &mapPtr[currentRow + 1][currentCol];
+                return pacman_ptr; 
+            }
+            else if (checkDownTile(currentRow, currentCol, Map) == Ghost) {
+                if(playerStats->powerUp == false) {
+                    printw("Game Over\n");
+                }
+                else {
+                    //TODO:reset ghost by going to block that contains 6
+                    //or wait 5-10 seconds before ghost is back to normal
+                }
+            }
             break;
         case KEY_LEFT:
-                 if (checkLeftTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
-            else if (checkLeftTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
-            else if (checkLeftTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
-            else if (checkLeftTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
-            else if (checkLeftTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
+            if (checkLeftTile(currentRow, currentCol, Map) == Wall) {
+                printw("hitting wall\n");
+            }
+            else if (checkLeftTile(currentRow, currentCol, Map) == Empty) {
+                printw("empty\n");
+                mapPtr[currentRow][currentCol - 1] = 4;
+                pacman_ptr = &mapPtr[currentRow][currentCol - 1];
+                mapPtr[currentRow][currentCol] = 0;
+                return pacman_ptr;
+            }
+            else if (checkLeftTile(currentRow, currentCol, Map) == PowerPellet) {
+                pthread_t tid;
+                //if thread is in execution stop execution and start a fresh one
+                //essentially setting the timer back to 10
+                //
+                //is there a tid value that indicates it is not executing
+                if(playerStats->powerUp == true) {
+                    //handlePowerUp();
+                    mapPtr[currentRow][currentCol] = Empty;
+                    pacman_ptr = &mapPtr[currentRow][currentCol - 1];
+                    return pacman_ptr; 
+                }
+                else {
+                    playerStats->powerUp = false;
+                    if(pthread_create(&tid, NULL, handlePowerUp, (void*)playerStats)) {
+                        fprintf(stderr, "error creating thread\n");
+                    }
+                    return pacman_ptr;
+                }
+            }
+            else if (checkLeftTile(currentRow, currentCol, Map) == Pellet) {
+                mapPtr[currentRow][currentCol] = Empty;
+                playerStats->score += 10;
+                printw("slot is now empty\n");
+                mapPtr[currentRow][currentCol - 1] = 4;
+                pacman_ptr = &mapPtr[currentRow][currentCol - 1];
+                return pacman_ptr; 
+            }
+            else if (checkLeftTile(currentRow, currentCol, Map) == Ghost) {
+                if(playerStats->powerUp == false) {
+                    printw("Game Over\n");
+                    exit(1);
+                }
+                else {
+                    //TODO:reset ghost by going to block that contains 6
+                    //or wait 5-10 seconds before ghost is back to normal
+                }
+            }
             break;
         case KEY_RIGHT:
-                 if (checkRightTile(currentRow, currentCol, Map) == Wall) { printf("hitting wall\n"); }
-            else if (checkRightTile(currentRow, currentCol, Map) == Empty) { printf("Nothing\n"); }
-            else if (checkRightTile(currentRow, currentCol, Map) == PowerPellet) { printf("PowerUP\n"); }
-            else if (checkRightTile(currentRow, currentCol, Map) == Pellet) { printf("Add to Score\n"); }
-            else if (checkRightTile(currentRow, currentCol, Map) == Ghost) { printf("Game Over\n"); }
+            if (checkRightTile(currentRow, currentCol, Map) == Wall) {
+                printw("hitting wall\n");
+            }
+            else if (checkRightTile(currentRow, currentCol, Map) == Empty) {
+                printw("empty\n");
+                mapPtr[currentRow][currentCol + 1] = 4;
+                pacman_ptr = &mapPtr[currentRow][currentCol + 1];
+                mapPtr[currentRow][currentCol] = 0;
+                return pacman_ptr;
+            }
+            else if (checkRightTile(currentRow, currentCol, Map) == PowerPellet) {
+                pthread_t tid;
+                //if thread is in execution stop execution and start a fresh one
+                //essentially setting the timer back to 10
+                //
+                //is there a tid value that indicates it is not executing
+                if(playerStats->powerUp == true) {
+                    //handlePowerUp();
+                    mapPtr[currentRow][currentCol] = Empty;
+                    pacman_ptr = &mapPtr[currentRow][currentCol + 1];
+                    return pacman_ptr; 
+                }
+                else {
+                    playerStats->powerUp = false;
+                    if(pthread_create(&tid, NULL, handlePowerUp, (void*)playerStats)) {
+                        fprintf(stderr, "error creating thread\n");
+                    }
+                    return pacman_ptr;
+                }
+            }
+            else if (checkRightTile(currentRow, currentCol, Map) == Pellet) {
+                mapPtr[currentRow][currentCol] = Empty;
+                playerStats->score += 10;
+                printw("slot is now empty\n");
+                mapPtr[currentRow][currentCol + 1] = 4;
+                pacman_ptr = &mapPtr[currentRow][currentCol + 1];
+                return pacman_ptr; 
+            }
+            else if (checkRightTile(currentRow, currentCol, Map) == Ghost) {
+                if(playerStats->powerUp == false) {
+                    printw("Game Over\n");
+                }
+                else {
+                    //TODO:reset ghost by going to block that contains 6
+                    //or wait 5-10 seconds before ghost is back to normal
+                }
+            }
             break;
     }
 }
@@ -138,8 +281,9 @@ void *handlePowerUp(void *playerStats) {
         struct Stats *pStats = (struct Stats *)playerStats;
         printf("power up enabled\n");
         sleep(10);
-        //TODO: lock powerup because it is inside a thread
+        pthread_mutex_lock(&mutex);
         pStats->powerUp = false;
+        pthread_mutex_unlock(&mutex);
         printf("power up disabled\n");
         pthread_exit(NULL);
 }
@@ -149,4 +293,15 @@ void moveInky();
 void movePinky();
 void moveBlinky();
 void moveClyde();
-int *handleMapChange(int reason, int *Map);
+//int *handleMapChange(int reason, int *Map);
+void printMap(void *Map) {
+    int(*mapPtr)[columns] = Map;
+    clear();
+    for(int x = 0; x < columns; x++) {
+        for(int y = 0; y < rows; y++) {
+            printw("%d\t", mapPtr[x][y]);
+        }
+        printw("\n");
+    }
+}
+

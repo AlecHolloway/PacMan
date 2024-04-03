@@ -1,0 +1,25 @@
+name: Valgrind
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  valgrind:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Install Valgrind
+      run: sudo apt-get update && sudo apt-get install -y valgrind
+
+    - name: Build project
+      run: |
+        gcc -g CheckTiles.c PacMan.c -lncurses 
+        # Or any other build command
+
+    - name: Run Valgrind
+      run: valgrind ./your_executable
+
