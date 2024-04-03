@@ -21,5 +21,5 @@ jobs:
         # Or any other build command
 
     - name: Run Valgrind
-      run: valgrind ./your_executable
+      run: valgrind ./a.out
 
